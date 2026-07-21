@@ -82,7 +82,7 @@
 <header>
   <div class="title">Paradoxical Book Title Generator</div>
   <div class="spacer"></div>
-  <button id="modeToggle">&#8646; Still + Force</button>
+  <button id="modeToggle">&#8646; Soft + Forceful</button>
   <button class="roll" id="roll">&#127922; Randomise</button>
   <div class="timer" id="timerBox"><span id="timerText">10:00</span><button id="timerToggle">Start</button><button id="timerReset">Reset</button></div>
 </header>
@@ -97,7 +97,7 @@
     <h2 id="howtoToggle">How to play <span class="caret">&#9660;</span></h2>
     <div class="howto-body">
       <p>A <strong>paradoxical book title</strong> is two words that should not sit together, but do: one adjective, one noun, holding a whole tension in a single phrase. <span class="eg">Radical Calm. Fragile Strength. Silent Spark.</span></p>
-      <p class="keys"><strong>&#8646; Still + Force</strong> flips which word bank carries the charge, soft adjectives with forceful nouns, or forceful adjectives with soft nouns. <strong>&#127922; Randomise</strong> spins a random pair. <strong>&#8635; New set</strong> swaps a column for a fresh list of words, five in all. The <strong>timer</strong> runs a ten-minute round.</p>
+      <p class="keys"><strong>&#8646; Soft + Forceful</strong> flips which word bank carries the charge, soft adjectives with forceful nouns, or forceful adjectives with soft nouns. <strong>&#127922; Randomise</strong> spins a random pair. <strong>&#8635; New set</strong> swaps a column for a fresh list of words, five in all. The <strong>timer</strong> runs a ten-minute round.</p>
       <p>Pull one word from each column, or coin your own. Then answer the question that matters: why does your book title fit the problem at hand?</p>
     </div>
   </div>
@@ -230,11 +230,11 @@ function applyMode(){
   if(mode==='sf'){
     adjChargeEl.textContent='still · soft · restrained';
     nounChargeEl.textContent='force · scale · motion';
-    modeBtn.innerHTML='&#8646; Still + Force';
+    modeBtn.innerHTML='&#8646; Soft + Forceful';
   } else {
     adjChargeEl.textContent='force · scale · motion';
     nounChargeEl.textContent='still · soft · restrained';
-    modeBtn.innerHTML='&#8646; Force + Still';
+    modeBtn.innerHTML='&#8646; Forceful + Soft';
   }
   ownAdj.value=''; ownNoun.value=''; mark(); update(true);
 }
