@@ -82,6 +82,7 @@
 <header>
   <div class="title">Paradoxical Book Title Generator</div>
   <div class="spacer"></div>
+  <button id="modeToggle">&#8646; Still + Force</button>
   <button class="roll" id="roll">&#127922; Randomise</button>
   <div class="timer" id="timerBox"><span id="timerText">10:00</span><button id="timerToggle">Start</button><button id="timerReset">Reset</button></div>
 </header>
@@ -96,19 +97,19 @@
     <h2 id="howtoToggle">How to play <span class="caret">&#9660;</span></h2>
     <div class="howto-body">
       <p>A <strong>paradoxical book title</strong> is two words that should not sit together, but do: one adjective, one noun, holding a whole tension in a single phrase. <span class="eg">Radical Calm. Fragile Strength. Silent Spark.</span></p>
-      <p class="keys"><strong>&#127922; Randomise</strong> spins a random pair. <strong>&#8635; New set</strong> swaps a column for a fresh list of words, five in all. The <strong>timer</strong> runs a ten-minute round.</p>
+      <p class="keys"><strong>&#8646; Still + Force</strong> flips which word bank carries the charge, soft adjectives with forceful nouns, or forceful adjectives with soft nouns. <strong>&#127922; Randomise</strong> spins a random pair. <strong>&#8635; New set</strong> swaps a column for a fresh list of words, five in all. The <strong>timer</strong> runs a ten-minute round.</p>
       <p>Pull one word from each column, or coin your own. Then answer the question that matters: why does your book title fit the problem at hand?</p>
     </div>
   </div>
 
   <div class="cols">
     <div class="col">
-      <h3>Adjective</h3><span class="charge">still &middot; soft &middot; restrained</span>
+      <h3>Adjective</h3><span class="charge" id="adjCharge">still &middot; soft &middot; restrained</span>
       <div class="stack" id="adjStack"></div>
       <button class="refresh" id="adjRefresh">&#8635; New set <span class="setnum" id="adjSetNum">1/5</span></button>
     </div>
     <div class="col">
-      <h3>Noun</h3><span class="charge">force &middot; scale &middot; motion</span>
+      <h3>Noun</h3><span class="charge" id="nounCharge">force &middot; scale &middot; motion</span>
       <div class="stack" id="nounStack"></div>
       <button class="refresh" id="nounRefresh">&#8635; New set <span class="setnum" id="nounSetNum">1/5</span></button>
     </div>
@@ -122,22 +123,40 @@
 </main>
 
 <script>
-const ADJ_SETS = [
+const ADJ_SETS_SF = [
   ["quiet","gentle","slow","fragile","patient","humble","reluctant","invisible","ordinary","tender"],
   ["silent","soft","still","mild","meek","hesitant","weary","faint","plain","delicate"],
   ["calm","hushed","small","timid","restrained","unhurried","modest","tentative","subtle","careful"],
   ["whispered","sleepy","brittle","docile","passive","cautious","mellow","dormant","feeble","guarded"],
   ["bashful","drowsy","meagre","placid","wary","sheepish","gradual","muted","understated","dim"]
 ];
-const NOUN_SETS = [
+const NOUN_SETS_SF = [
   ["storm","engine","fire","revolution","machine","avalanche","empire","riot","flood","blaze"],
   ["thunder","furnace","army","eruption","current","tempest","uprising","wildfire","torrent","surge"],
   ["earthquake","reactor","kingdom","stampede","hurricane","inferno","rebellion","tsunami","dynamo","juggernaut"],
   ["cyclone","volcano","dynasty","onslaught","turbine","cascade","insurgency","meltdown","deluge","detonation"],
   ["whirlwind","forge","regime","barrage","colossus","maelstrom","crusade","landslide","monsoon","explosion"]
 ];
+const ADJ_SETS_FS = [
+  ["furious","raging","explosive","ferocious","violent","thunderous","roaring","blazing","savage","relentless"],
+  ["aggressive","volatile","turbulent","fierce","wild","brutal","intense","electric","seismic","torrential"],
+  ["cataclysmic","unstoppable","overwhelming","colossal","monumental","incendiary","tempestuous","ruthless","unrelenting","volcanic"],
+  ["rampaging","scorching","convulsive","insurgent","marauding","riotous","seething","eruptive","tidal","blistering"],
+  ["apocalyptic","insurmountable","unbridled","tumultuous","feral","unyielding","monstrous","untamed","combustible","molten"]
+];
+const NOUN_SETS_FS = [
+  ["whisper","hush","calm","stillness","silence","murmur","breath","feather","candle","shadow"],
+  ["mist","dew","petal","lull","dusk","twilight","echo","ember","ripple","sigh"],
+  ["glow","haven","cocoon","cradle","veil","snowflake","pause","glimmer","embrace","lullaby"],
+  ["bud","blossom","meadow","moth","cloud","brook","willow","haze","pillow","nest"],
+  ["dove","ribbon","thread","wisp","sanctuary","refuge","hollow","glade","solace","cushion"]
+];
+let mode='sf'; // 'sf' = still adjective + force noun, 'fs' = force adjective + still noun
+function currentAdjSets(){ return mode==='sf' ? ADJ_SETS_SF : ADJ_SETS_FS; }
+function currentNounSets(){ return mode==='sf' ? NOUN_SETS_SF : NOUN_SETS_FS; }
+
 let adjSetIdx=0, nounSetIdx=0;
-let ADJ = ADJ_SETS[adjSetIdx], NOUN = NOUN_SETS[nounSetIdx];
+let ADJ = currentAdjSets()[adjSetIdx], NOUN = currentNounSets()[nounSetIdx];
 let selAdj=null, selNoun=null;
 
 const combo=document.getElementById('combo'), why=document.getElementById('why'),
@@ -184,18 +203,42 @@ build(adjStack, ADJ, 'a'); build(nounStack, NOUN, 'n');
 /* refresh: cycle the whole set in a column */
 function refreshCol(which){
   if(which==='a'){
-    adjSetIdx=(adjSetIdx+1)%ADJ_SETS.length; ADJ=ADJ_SETS[adjSetIdx]; selAdj=null;
+    const sets=currentAdjSets();
+    adjSetIdx=(adjSetIdx+1)%sets.length; ADJ=sets[adjSetIdx]; selAdj=null;
     adjStack.innerHTML=''; build(adjStack, ADJ, 'a');
-    document.getElementById('adjSetNum').textContent=`${adjSetIdx+1}/${ADJ_SETS.length}`;
+    document.getElementById('adjSetNum').textContent=`${adjSetIdx+1}/${sets.length}`;
   } else {
-    nounSetIdx=(nounSetIdx+1)%NOUN_SETS.length; NOUN=NOUN_SETS[nounSetIdx]; selNoun=null;
+    const sets=currentNounSets();
+    nounSetIdx=(nounSetIdx+1)%sets.length; NOUN=sets[nounSetIdx]; selNoun=null;
     nounStack.innerHTML=''; build(nounStack, NOUN, 'n');
-    document.getElementById('nounSetNum').textContent=`${nounSetIdx+1}/${NOUN_SETS.length}`;
+    document.getElementById('nounSetNum').textContent=`${nounSetIdx+1}/${sets.length}`;
   }
   ownAdj.value=''; ownNoun.value=''; mark(); update(true);
 }
 document.getElementById('adjRefresh').onclick=()=>refreshCol('a');
 document.getElementById('nounRefresh').onclick=()=>refreshCol('n');
+
+/* mode toggle: swap which part of speech carries the charge */
+const adjChargeEl=document.getElementById('adjCharge'), nounChargeEl=document.getElementById('nounCharge'), modeBtn=document.getElementById('modeToggle');
+function applyMode(){
+  adjSetIdx=0; nounSetIdx=0; selAdj=null; selNoun=null;
+  ADJ=currentAdjSets()[0]; NOUN=currentNounSets()[0];
+  adjStack.innerHTML=''; build(adjStack, ADJ, 'a');
+  nounStack.innerHTML=''; build(nounStack, NOUN, 'n');
+  document.getElementById('adjSetNum').textContent=`1/${currentAdjSets().length}`;
+  document.getElementById('nounSetNum').textContent=`1/${currentNounSets().length}`;
+  if(mode==='sf'){
+    adjChargeEl.textContent='still · soft · restrained';
+    nounChargeEl.textContent='force · scale · motion';
+    modeBtn.innerHTML='&#8646; Still + Force';
+  } else {
+    adjChargeEl.textContent='force · scale · motion';
+    nounChargeEl.textContent='still · soft · restrained';
+    modeBtn.innerHTML='&#8646; Force + Still';
+  }
+  ownAdj.value=''; ownNoun.value=''; mark(); update(true);
+}
+modeBtn.onclick=()=>{ mode = (mode==='sf') ? 'fs' : 'sf'; applyMode(); };
 
 /* how-to: collapse/expand */
 const howto=document.getElementById('howto');
